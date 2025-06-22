@@ -1,0 +1,7 @@
+setup.py
+src/mutsynchub_analytics.egg-info/PKG-INFO
+src/mutsynchub_analytics.egg-info/SOURCES.txt
+src/mutsynchub_analytics.egg-info/dependency_links.txt
+src/mutsynchub_analytics.egg-info/requires.txt
+src/mutsynchub_analytics.egg-info/top_level.txt
+tests/test_analytics.py

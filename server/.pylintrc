@@ -1,0 +1,23 @@
+[MASTER]
+# Add paths to the Python modules you want to analyze
+init-hook='import sys; sys.path.append(".")'
+
+# Use multiple processes to speed up Pylint
+jobs=0
+
+# List of plugins to load
+load-plugins=
+
+# Allow loading of arbitrary C extensions
+unsafe-load-any-extension=no
+
+[MESSAGES CONTROL]
+# Disable specific warnings
+disable=C0111,  # missing-docstring
+        C0103,  # invalid-name
+        C0303,  # trailing-whitespace
+        C0301,  # line-too-long
+        W0611,  # unused-import
+        C0411,  # wrong-import-order
+        C0415,  # import-outside-toplevel
+        R0914   # too-many-locals

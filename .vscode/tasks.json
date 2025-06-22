@@ -1,0 +1,18 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "shell",
+			"label": "Test Analytics Schedule Endpoints",
+			"command": "npm run test",
+			"args": [
+				"src/modules/analytics/analytics.controller.ts"
+			],
+			"problemMatcher": [
+				"$tsc"
+			],
+			"group": "test",
+			"isBackground": false
+		}
+	]
+}

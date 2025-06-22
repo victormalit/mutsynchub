@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<coverage generated="1749743513969" clover="3.2.0">
+  <project timestamp="1749743513969" name="All files">
+    <metrics statements="27" coveredstatements="25" conditionals="45" coveredconditionals="36" methods="2" coveredmethods="2" elements="74" coveredelements="63" complexity="0" loc="27" ncloc="27" packages="1" files="1" classes="1"/>
+    <file name="error-handling.middleware.ts" path="/home/peter/mutsynchub/server/src/infrastructure/persistence/prisma/middleware/error-handling.middleware.ts">
+      <metrics statements="27" coveredstatements="25" conditionals="45" coveredconditionals="36" methods="2" coveredmethods="2"/>
+      <line num="2" count="1" type="stmt"/>
+      <line num="5" count="1" type="stmt"/>
+      <line num="7" count="10" type="stmt"/>
+      <line num="8" count="10" type="stmt"/>
+      <line num="11" count="10" type="stmt"/>
+      <line num="16" count="5" type="stmt"/>
+      <line num="17" count="5" type="stmt"/>
+      <line num="20" count="4" type="stmt"/>
+      <line num="28" count="4" type="stmt"/>
+      <line num="29" count="4" type="stmt"/>
+      <line num="30" count="4" type="cond" truecount="4" falsecount="1"/>
+      <line num="31" count="4" type="stmt"/>
+      <line num="32" count="4" type="stmt"/>
+      <line num="34" count="0" type="stmt"/>
+      <line num="35" count="0" type="stmt"/>
+      <line num="39" count="4" type="cond" truecount="2" falsecount="0"/>
+      <line num="40" count="1" type="stmt"/>
+      <line num="46" count="1" type="cond" truecount="1" falsecount="0"/>
+      <line num="47" count="1" type="stmt"/>
+      <line num="49" count="3" type="cond" truecount="2" falsecount="0"/>
+      <line num="50" count="1" type="stmt"/>
+      <line num="54" count="2" type="cond" truecount="2" falsecount="0"/>
+      <line num="55" count="1" type="stmt"/>
+      <line num="60" count="1" type="stmt"/>
+      <line num="68" count="4" type="cond" truecount="1" falsecount="0"/>
+      <line num="69" count="4" type="stmt"/>
+      <line num="86" count="4" type="stmt"/>
+    </file>
+  </project>
+</coverage>
