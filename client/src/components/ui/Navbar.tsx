@@ -98,7 +98,7 @@ const Navbar: React.FC = () => {
           onClick={() => setSidebarOpen(true)}
           aria-label="Open sidebar"
         >
-          <Menu className="h-6 w-6 text-black" />
+          <Menu className="h-6 w-6 !text-black" />
         </button>
         {/* Logo & Brand */}
         <Link to="/" className="flex items-center space-x-2">

@@ -24,3 +24,10 @@ dist-ssr
 *.sw?
 
 *storybook.log
+
+# Ignore all env and secret files
+.env*
+*.env*
+!*.env.example
+# Ignore secrets
+secrets.*

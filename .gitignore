@@ -1,1 +1,7 @@
 node_modules
+# Ignore all env and secret files
+.env*
+*.env*
+!*.env.example
+# Ignore secrets
+secrets.*
