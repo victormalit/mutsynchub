@@ -39,7 +39,7 @@ export class ApiKeyService {
         key, // Include the key only on creation
       };
     } catch (error) {
-      this.logger.error(`Failed to create API key: orgId=${orgId}, error=${error.message}`, error.stack);
+      this.logger.error(`Failed to create API key: orgId=${orgId}, error=${(error as any).message}`, (error as any).stack);
       throw error;
     }
   }
@@ -89,8 +89,8 @@ export class ApiKeyService {
       };
     } catch (error) {
       this.logger.error(
-        `API key validation failed: requestId=${requestId}, error=${error.message}`, 
-        error.stack
+        `API key validation failed: requestId=${requestId}, error=${(error as any).message}`,
+        (error as any).stack
       );
       throw error;
     }
@@ -120,7 +120,7 @@ export class ApiKeyService {
       this.logger.log(`API key revoked: keyId=${id}, orgId=${orgId}`);
       return updated;
     } catch (error) {
-      this.logger.error(`Failed to revoke API key: keyId=${id}, error=${error.message}`, error.stack);
+      this.logger.error(`Failed to revoke API key: keyId=${id}, error=${(error as any).message}`, (error as any).stack);
       throw error;
     }
   }
@@ -152,7 +152,7 @@ export class ApiKeyService {
 
       return apiKeys;
     } catch (error) {
-      this.logger.error(`Failed to list API keys: orgId=${orgId}, error=${error.message}`, error.stack);
+      this.logger.error(`Failed to list API keys: orgId=${orgId}, error=${(error as any).message}`, (error as any).stack);
       throw error;
     }
   }

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { SchedulerRegistry } from '@nestjs/schedule';
 import { PrismaService } from '../../infrastructure/persistence/prisma/prisma.service';
-import { AuditLoggerService } from '../../common/services/audit-logger.service';
+import { AuditLoggerService } from '../../audit/audit-logger.service';
 import { AnalyticsService } from './analytics.service';
 import { CronJob } from 'cron';
 
@@ -19,9 +19,9 @@ export class AnalyticsScheduleService {
     interval?: number;
   }) {
     // Enforce frequency limits by org tier
-    const org = await this.prisma.organization.findUnique({ where: { id: orgId } });
+    const org = await this.prisma.organization.findUnique({ where: { id: orgId }, include: { subscription: true } });
     if (!org) throw new Error('Organization not found');
-    const tier = org.subscriptionTier || 'STARTER';
+    const tier = org.subscription?.plan || 'STARTER';
     const allowedFrequencies: Record<string, string[]> = {
       STARTER: ['weekly'],
       BUSINESS: ['daily', 'weekly'],
@@ -61,9 +61,9 @@ export class AnalyticsScheduleService {
     // Enforce frequency limits by org tier
     const schedule = await this.prisma.analyticsSchedule.findUnique({ where: { id } });
     if (!schedule) throw new Error('Schedule not found');
-    const org = await this.prisma.organization.findUnique({ where: { id: schedule.orgId } });
+    const org = await this.prisma.organization.findUnique({ where: { id: schedule.orgId }, include: { subscription: true } });
     if (!org) throw new Error('Organization not found');
-    const tier = org.subscriptionTier || 'STARTER';
+    const tier = org.subscription?.plan || 'STARTER';
     const allowedFrequencies: Record<string, string[]> = {
       STARTER: ['weekly'],
       BUSINESS: ['daily', 'weekly'],
@@ -225,7 +225,7 @@ export class AnalyticsScheduleService {
             scheduleId: schedule.id,
             error: true
           },
-          results: { error: error.message },
+          results: { error: (error as any).message },
           lastRun: new Date(),
         },
       });
@@ -237,7 +237,7 @@ export class AnalyticsScheduleService {
         resource: 'ANALYTICS',
         details: {
           scheduleId: schedule.id,
-          error: error.message,
+          error: (error as any).message,
         },
       });
     }

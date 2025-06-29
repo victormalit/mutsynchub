@@ -9,17 +9,20 @@ import { AutomatedAnalysisService } from './services/automated-analysis.service'
 import { DataCleaningService } from './services/data-cleaning.service';
 import { AnalyticsCacheService } from './services/analytics-cache.service';
 import { WebsocketModule } from '../../interfaces/websocket/websocket.module';
-import { PrismaModule } from '../../infrastructure/persistence/prisma/prisma.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MLModule } from '../../infrastructure/ml/ml.module';
+import { CommonModule } from '../../common/common.module';
+import { AuditModule } from '../../audit/audit.module';
+import { QueryInterpreterService } from './services/query-interpreter.service';
 
 @Module({
   imports: [
     ScheduleModule.forRoot(),
     DataSourceModule,
-    PrismaModule,
     WebsocketModule,
     MLModule,
+    CommonModule,
+    AuditModule,
   ],
   providers: [
     AnalyticsService,
@@ -28,6 +31,7 @@ import { MLModule } from '../../infrastructure/ml/ml.module';
     DataCleaningService,
     AnalyticsCacheService,
     DataGateway,
+    QueryInterpreterService,
   ],
   controllers: [AnalyticsController],
   exports: [AnalyticsService, AnalyticsScheduleService],

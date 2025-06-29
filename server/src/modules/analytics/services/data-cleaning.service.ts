@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { IndustryType } from '../interfaces/analysis-request.dto';
-import { PrismaService } from '../../../infrastructure/prisma/prisma.service';
+import { PrismaService } from '../../../infrastructure/persistence/prisma/prisma.service';
 
 @Injectable()
 export class DataCleaningService {
@@ -21,7 +21,7 @@ export class DataCleaningService {
       
       return cleanedData;
     } catch (error) {
-      this.logger.error(`Error cleaning data: ${error.message}`);
+      this.logger.error(`Error cleaning data: ${(error as any).message}`);
       throw error;
     }
   }

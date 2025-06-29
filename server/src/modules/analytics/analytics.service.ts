@@ -2,7 +2,7 @@ import { Injectable, Inject, forwardRef } from '@nestjs/common';
 import { PrismaService } from '../../infrastructure/persistence/prisma/prisma.service';
 import { DataGateway } from '../../interfaces/websocket/data.gateway';
 import { Dataset } from '@prisma/client';
-import { AuditLoggerService } from '../../common/services/audit-logger.service';
+import { AuditLoggerService } from '../../audit/audit-logger.service';
 import { spawn } from 'child_process';
 import * as path from 'path';
 

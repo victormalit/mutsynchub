@@ -3,7 +3,7 @@ import {
   NestInterceptor,
   ExecutionContext,
   CallHandler,
-  TooManyRequestsException,
+  BadRequestException,
   Logger
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
@@ -31,7 +31,7 @@ export class RateLimitInterceptor implements NestInterceptor {
 
     if (requestCounts[ip].count > MAX_REQUESTS_PER_WINDOW) {
       this.logger.warn(`Rate limit exceeded for IP: ${ip}`);
-      throw new TooManyRequestsException('Too many requests, please try again later.');
+      throw new BadRequestException('Too many requests, please try again later.');
     }
 
     return next.handle().pipe(

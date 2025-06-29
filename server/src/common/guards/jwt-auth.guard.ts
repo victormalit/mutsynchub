@@ -45,15 +45,15 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
         // Re-throw tenant mismatch errors as-is
         throw error;
       }
-      if (error instanceof TokenExpiredError) {
-        this.logger.error(`JWT Auth error: ${error.message}`, error.stack);
+      if ((error as any) instanceof TokenExpiredError) {
+        this.logger.error(`JWT Auth error: ${(error as any).message}`, (error as any).stack);
         throw new UnauthorizedException('Token has expired');
       }
-      if (error instanceof JsonWebTokenError) {
-        this.logger.error(`JWT Auth error: ${error.message}`, error.stack);
+      if ((error as any) instanceof JsonWebTokenError) {
+        this.logger.error(`JWT Auth error: ${(error as any).message}`, (error as any).stack);
         throw new UnauthorizedException('Invalid token format');
       }
-      this.logger.error(`JWT Auth error: ${error.message}`, error.stack);
+      this.logger.error(`JWT Auth error: ${(error as any).message}`, (error as any).stack);
       throw new UnauthorizedException('Authentication failed');
     }
   }

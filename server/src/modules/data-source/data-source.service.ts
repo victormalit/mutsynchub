@@ -226,4 +226,23 @@ export class DataSourceService {
 
     return dataSources;
   }
+
+  // --- STUBS ADDED FOR CONTROLLER ---
+  async update(id: string, updateDto: any) {
+    this.logger.warn('update() stub called. Implement logic as needed.');
+    // TODO: Implement update logic
+    return { id, ...updateDto };
+  }
+
+  async delete(id: string) {
+    this.logger.warn('delete() stub called. Implement logic as needed.');
+    // TODO: Implement delete logic
+    return { id, deleted: true };
+  }
+
+  async createStream(id: string, createDto: any) {
+    this.logger.warn('createStream() stub called. Implement logic as needed.');
+    // TODO: Implement createStream logic
+    return { dataSourceId: id, ...createDto };
+  }
 }

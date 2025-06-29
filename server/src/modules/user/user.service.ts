@@ -1,7 +1,7 @@
 import { Injectable, ConflictException, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../infrastructure/persistence/prisma/prisma.service';
 import { UserRole, UserStatus } from '@prisma/client';
-import { AuditLoggerService } from '../../common/services/audit-logger.service';
+import { AuditLoggerService } from '../../audit/audit-logger.service';
 
 @Injectable()
 export class UserService {

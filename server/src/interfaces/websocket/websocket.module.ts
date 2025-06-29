@@ -4,6 +4,6 @@ import { ConnectionStateService } from './connection-state.service';
 
 @Module({
   providers: [DataGateway, ConnectionStateService],
-  exports: [DataGateway],
+  exports: [DataGateway, ConnectionStateService],
 })
 export class WebsocketModule {}

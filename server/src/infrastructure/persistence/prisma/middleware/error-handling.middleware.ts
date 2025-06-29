@@ -1,12 +1,8 @@
 import { Logger } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
-import { AuditLoggerService } from '../../../../common/services/audit-logger.service';
 
 export class ErrorHandlingMiddleware {
-  constructor(
-    private readonly logger: Logger,
-    private readonly auditLogger: AuditLoggerService
-  ) {}
+  constructor(private readonly logger: Logger) {}
 
   handle = async (
     params: Prisma.MiddlewareParams,
@@ -64,25 +60,6 @@ export class ErrorHandlingMiddleware {
         });
       }
 
-      // Audit log for DB errors (compliance)
-      if (this.auditLogger) {
-        await this.auditLogger.log({
-          userId: userContext?.userId || 'system',
-          orgId: userContext?.orgId,
-          action: 'db_error',
-          resource: params.model || 'unknown',
-          details: {
-            errorType: error?.constructor?.name,
-            errorMessage,
-            errorStack,
-            prismaAction: params.action,
-            prismaArgs: params.args,
-            ...errorContext,
-          },
-          ipAddress: userContext?.ipAddress,
-          userAgent: userContext?.userAgent,
-        });
-      }
       throw error;
     }
   };

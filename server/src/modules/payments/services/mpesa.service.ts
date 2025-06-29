@@ -1,8 +1,8 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '../../../infrastructure/persistence/prisma/prisma.service';
-import { AuditLoggerService } from '../../../common/services/audit-logger.service';
-import axios,  from 'axios';
+import { AuditLoggerService } from '../../../audit/audit-logger.service';
+import axios from 'axios';
 import moment from 'moment';
 import {
   MpesaConfig,
@@ -281,12 +281,13 @@ export class MpesaService {
           // Find the user's organization
           const user = await this.prisma.user.findUnique({ where: { id: payment.userId } });
           if (user && user.orgId) {
-            await this.prisma.organization.update({
-              where: { id: user.orgId },
+            await this.prisma.subscription.update({
+              where: { orgId: user.orgId },
               data: {
-                subscriptionTier: tier,
-                subscriptionStatus: 'ACTIVE',
-                subscriptionUpdatedAt: new Date(),
+                plan: tier,
+                status: 'ACTIVE',
+                startDate: new Date(),
+                endDate: null,
               },
             });
           }

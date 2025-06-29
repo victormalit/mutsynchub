@@ -25,11 +25,15 @@ export class SubscriptionTierGuard implements CanActivate {
     if (!user) throw new ForbiddenException('User not authenticated');
 
     // Fetch org from DB (or from request if already attached)
-    const org = await this.prisma.organization.findUnique({ where: { id: user.orgId } });
+    const org = await this.prisma.organization.findUnique({
+      where: { id: user.orgId },
+      include: { subscription: true },
+    });
     if (!org) throw new ForbiddenException('Organization not found');
 
     const tierOrder = ['STARTER', 'BUSINESS', 'CORPORATE'];
-    const orgTierIdx = tierOrder.indexOf(org.subscriptionTier);
+    const orgTier = org.subscription?.plan || 'STARTER';
+    const orgTierIdx = tierOrder.indexOf(orgTier);
     const requiredTierIdx = tierOrder.indexOf(requiredTier);
     if (orgTierIdx < requiredTierIdx) {
       throw new ForbiddenException(`Upgrade to ${requiredTier} to access this feature.`);

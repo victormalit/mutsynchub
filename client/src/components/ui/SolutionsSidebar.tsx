@@ -1,8 +1,9 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { FaBox, FaBook, FaLifeRing, FaTimes } from 'react-icons/fa';
+import { FaBox, FaBook, FaLifeRing, FaTimes, FaHome } from 'react-icons/fa';
 
 const navItems = [
+  { to: '/home', icon: <FaHome />, label: 'Home' },
   { to: '/solutions', icon: <FaBox />, label: 'Solutions' },
   { to: '/resources', icon: <FaBook />, label: 'Resources' },
   { to: '/support', icon: <FaLifeRing />, label: 'Support' },
@@ -40,7 +41,7 @@ const SolutionsSidebar: React.FC<SidebarProps> = ({ open, onClose }) => (
         >
           {/* Force sidebar menu icon to black if this is the menu icon */}
           {item.label === 'Solutions' && false /* placeholder for menu icon logic */}
-          {React.cloneElement(item.icon, { color: 'white', size: 28 })}
+          {React.cloneElement(item.icon, { color: 'black', size: 28 })}
           <span className="text-xs mt-1">{item.label}</span>
         </NavLink>
       ))}

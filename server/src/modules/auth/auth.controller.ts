@@ -1,13 +1,18 @@
-import { Controller, Post, Body, UseGuards, Get, Request } from '@nestjs/common';
+import { Controller, Post, Body, UseGuards, Get, Request, Res, Query, UnauthorizedException } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { RegisterDto, LoginDto } from './dto/auth.dto';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
+import { SSOService } from './services/sso.service';
+import { Response } from 'express';
 
 @ApiTags('Authentication')
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly ssoService: SSOService,
+  ) {}
 
   @Post('register')
   @ApiOperation({ summary: 'Register a new user and organization' })
@@ -22,7 +27,11 @@ export class AuthController {
   @ApiResponse({ status: 200, description: 'Successfully logged in' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   async login(@Body() loginDto: LoginDto) {
-    return this.authService.login(loginDto);
+    const user = await this.authService.validateUser(loginDto.email, loginDto.password);
+    if (!user) {
+      throw new UnauthorizedException('Invalid credentials');
+    }
+    return this.authService.login(user);
   }
 
   @Get('profile')
@@ -32,5 +41,26 @@ export class AuthController {
   @ApiResponse({ status: 200, description: 'Profile data' })
   async getProfile(@Request() req) {
     return req.user;
+  }
+
+  @Get('sso/google')
+  @ApiOperation({ summary: 'Initiate Google SSO login' })
+  async googleSSO(@Res() res: Response) {
+    await this.ssoService.initializeOIDCClient('google');
+    const url = await this.ssoService.handleOIDCLogin('google');
+    return res.redirect(url);
+  }
+
+  @Get('sso/google/callback')
+  @ApiOperation({ summary: 'Google SSO callback' })
+  async googleSSOCallback(@Request() req, @Res() res: Response, @Query() query: any) {
+    try {
+      const user = await this.ssoService.verifyOIDCCallback('google', query);
+      // Redirect to frontend analytics landing page with success
+      return res.redirect(`${process.env.FRONTEND_URL}/analytics?success=1`);
+    } catch (error) {
+      const errMsg = error instanceof Error ? error.message : String(error);
+      return res.redirect(`${process.env.FRONTEND_URL}/login?error=${encodeURIComponent(errMsg)}`);
+    }
   }
 }

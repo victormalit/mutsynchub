@@ -1,7 +1,7 @@
 import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '../../../infrastructure/persistence/prisma/prisma.service';
-import { AuditLoggerService } from '../../../common/services/audit-logger.service';
+import { AuditLoggerService } from '../../../audit/audit-logger.service';
 import { Issuer } from 'openid-client';
 import * as saml2 from 'saml2-js';
 import { randomBytes } from 'crypto';
@@ -79,10 +79,20 @@ export class SSOService {
       assertEndpoint: this.configService.get(`SSO_${upperProvider}_ASSERT_ENDPOINT`),
       audience: this.configService.get(`SSO_${upperProvider}_AUDIENCE`),
     };
-    // Validate required config
-    for (const [key, value] of Object.entries(config)) {
-      if (!value) {
-        throw new Error(`Missing SSO config for ${provider}: ${key}`);
+    // Only require OIDC fields for Google, SAML fields for others
+    if (provider.toLowerCase() === 'google') {
+      const required = ['clientId', 'clientSecret', 'discoveryUrl', 'redirectUri'];
+      for (const key of required) {
+        if (!config[key]) {
+          throw new Error(`Missing SSO config for ${provider}: ${key}`);
+        }
+      }
+    } else {
+      // SAML or other providers
+      for (const [key, value] of Object.entries(config)) {
+        if (!value) {
+          throw new Error(`Missing SSO config for ${provider}: ${key}`);
+        }
       }
     }
     return config;
@@ -129,9 +139,11 @@ export class SSOService {
     }
 
     try {
+      const state = params.state;
       const tokenSet = await client.callback(
         this.getProviderConfig(provider).redirectUri,
         params,
+        { state } // Pass state to checks
       );
 
       const userInfo = await client.userinfo(tokenSet.access_token);
@@ -203,6 +215,7 @@ export class SSOService {
             data: {
               name: 'Default Organization',
               status: 'ACTIVE',
+              subdomain: 'default', // You may want to generate or configure this value
               // TODO: Add more org fields as needed
             },
           });

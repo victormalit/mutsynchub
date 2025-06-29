@@ -3,17 +3,16 @@ import { AdminController } from './admin.controller';
 import { AdminService } from './admin.service';
 import { AuditLogController } from './audit-log.controller';
 import { RevenueController } from './revenue.controller';
-import { PrismaService } from '../../infrastructure/persistence/prisma/prisma.service';
-import { AuditLoggerService } from '../../common/services/audit-logger.service';
 import { RolesGuard } from '../../common/guards/roles.guard';
 import { APP_GUARD, Reflector } from '@nestjs/core';
+import { CommonModule } from '../../common/common.module';
+import { AuditModule } from '../../audit/audit.module';
 
 @Module({
+  imports: [CommonModule, AuditModule],
   controllers: [AdminController, AuditLogController, RevenueController],
   providers: [
     AdminService,
-    PrismaService,
-    AuditLoggerService,
     Reflector,
     { provide: APP_GUARD, useClass: RolesGuard },
   ],

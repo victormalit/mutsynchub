@@ -15,6 +15,9 @@ import Revenue from '../components/admin/Revenue';
 import UsersOrgs from '../components/admin/UsersOrgs';
 import Analytics from '../components/admin/Analytics';
 import Settings from '../components/admin/Settings';
+import LoginPage from '../pages/Login';
+import SignupPage from '../pages/Signup';
+import ProtectedRoute from '../components/ui/ProtectedRoute';
 
 
 
@@ -29,18 +32,26 @@ const routes: RouteObject[] = [
       { path: 'solutions', element: <SolutionsWithSidebar /> },
       { path: 'resources', element: <Resources /> },
       { path: 'support', element: <Support /> },
+      { path: 'login', element: <LoginPage /> },
+      { path: 'signup', element: <SignupPage /> },
     ],
   },
   {
     path: '/analytics',
-    element: <AnalyticsEngineDashboard />,
+    element: <ProtectedRoute />,
     children: [
-      { index: true, element: <AnalyticsDashboardLanding /> },
-      { path: 'analytics', element: <Analytics /> },
-      { path: 'audit-logs', element: <AuditLogs /> },
-      { path: 'revenue', element: <Revenue /> },
-      { path: 'users', element: <UsersOrgs /> },
-      { path: 'settings', element: <Settings /> },
+      {
+        index: false,
+        element: <AnalyticsEngineDashboard />,
+        children: [
+          { index: true, element: <AnalyticsDashboardLanding /> },
+          { path: 'analytics', element: <Analytics /> },
+          { path: 'audit-logs', element: <AuditLogs /> },
+          { path: 'revenue', element: <Revenue /> },
+          { path: 'users', element: <UsersOrgs /> },
+          { path: 'settings', element: <Settings /> },
+        ],
+      },
     ],
   },
 ];

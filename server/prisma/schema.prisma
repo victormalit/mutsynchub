@@ -1,187 +1,236 @@
-// This is your Prisma schema file
+generator client {
+  provider = "prisma-client-js"
+}
+
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
-generator client {
-  provider = "prisma-client-js"
-}
-
-// Multi-tenancy
 model Organization {
-  id            String            @id @default(uuid())
-  name          String
-  subdomain     String           @unique
-  createdAt     DateTime         @default(now())
-  updatedAt     DateTime         @updatedAt
-  users         User[]
-  apiKeys       ApiKey[]
-  dataSources   DataSource[]
-  datasets      Dataset[]
-  reports       AnalyticsReport[]
-  settings      Json?
-  status        OrgStatus        @default(ACTIVE)
-  subscription  Subscription?
-  subscriptionTier String?   // 'STARTER', 'BUSINESS', 'CORPORATE'
-  subscriptionStatus String? // 'ACTIVE', 'CANCELLED', etc.
-  subscriptionUpdatedAt DateTime?
-  analyticsSchedules AnalyticsSchedule[]
-  payments      Payment[]
+  id                     String                  @id @default(uuid())
+  name                   String
+  subdomain              String                  @unique
+  createdAt              DateTime                @default(now())
+  updatedAt              DateTime                @updatedAt
+  settings               Json?
+  status                 OrgStatus               @default(ACTIVE)
+  reports                AnalyticsReport[]
+  analyticsSchedules     AnalyticsSchedule[]
+  apiKeys                ApiKey[]
+  dataSources            DataSource[]
+  datasets               Dataset[]
+  payments               Payment[]
   paymentReconciliations PaymentReconciliation[]
+  subscription           Subscription?
+  users                  User[]
 }
 
 model User {
-  id            String       @id @default(uuid())
-  email         String       @unique
-  password      String
-  firstName     String?
-  lastName      String?
-  role          UserRole     @default(USER)
-  organization  Organization @relation(fields: [orgId], references: [id])
-  orgId         String
-  createdAt     DateTime     @default(now())
-  updatedAt     DateTime     @updatedAt
-  lastLoginAt   DateTime?
-  status        UserStatus   @default(ACTIVE)
-  auditLogs     AuditLog[]
-  payments      Payment[]
+  id           String       @id @default(uuid())
+  email        String       @unique
+  password     String
+  firstName    String?
+  lastName     String?
+  role         UserRole     @default(USER)
+  orgId        String
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  lastLoginAt  DateTime?
+  status       UserStatus   @default(ACTIVE)
+  auditLogs    AuditLog[]
+  payments     Payment[]
+  organization Organization @relation(fields: [orgId], references: [id])
 }
 
-// API Management
 model ApiKey {
-  id            String       @id @default(cuid())
-  key           String       @unique
-  name          String
-  status        String       @default("ACTIVE")
-  scopes        String[]
-  orgId         String
-  createdAt     DateTime     @default(now())
-  expiresAt     DateTime?
-  lastUsedAt    DateTime?
-  useCount      Int          @default(0)
-  revokedAt     DateTime?
-  organization  Organization @relation(fields: [orgId], references: [id])
+  id           String       @id @default(cuid())
+  key          String       @unique
+  name         String
+  orgId        String
+  expiresAt    DateTime?
+  createdAt    DateTime     @default(now())
+  lastUsedAt   DateTime?
+  scopes       String[]
+  revokedAt    DateTime?
+  useCount     Int          @default(0)
+  status       String       @default("ACTIVE")
+  organization Organization @relation(fields: [orgId], references: [id])
 }
 
-// Data Source Integration
 model DataSource {
-  id            String       @id @default(uuid())
-  name          String
-  type          DataSourceType
-  organization  Organization @relation(fields: [orgId], references: [id])
-  orgId         String
-  config        Json            // Stores connection details securely
-  createdAt     DateTime        @default(now())
-  updatedAt     DateTime        @updatedAt
-  status        DataSourceStatus @default(ACTIVE)
-  lastSyncAt    DateTime?
-  dataStreams   DataStream[]
-  datasets      Dataset[]       // Added this relation
+  id           String           @id @default(uuid())
+  name         String
+  type         DataSourceType
+  orgId        String
+  config       Json
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+  status       DataSourceStatus @default(ACTIVE)
+  lastSyncAt   DateTime?
+  organization Organization     @relation(fields: [orgId], references: [id])
+  dataStreams  DataStream[]
+  datasets     Dataset[]
 }
 
 model DataStream {
-  id            String       @id @default(uuid())
-  name          String
-  dataSource    DataSource   @relation(fields: [dataSourceId], references: [id])
-  dataSourceId  String
-  schema        Json        // Defines the structure of incoming data
-  transformations Json?     // Optional data transformations
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
-  status        StreamStatus @default(ACTIVE)
+  id              String       @id @default(uuid())
+  name            String
+  dataSourceId    String
+  schema          Json
+  transformations Json?
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+  status          StreamStatus @default(ACTIVE)
+  dataSource      DataSource   @relation(fields: [dataSourceId], references: [id])
 }
 
-// Audit Logging
 model AuditLog {
-  id            String      @id @default(uuid())
-  user          User        @relation(fields: [userId], references: [id])
-  userId        String
-  action        String
-  resource      String
-  details       Json?
-  createdAt     DateTime    @default(now())
-  ipAddress     String?
-  userAgent     String?
+  id        String   @id @default(uuid())
+  userId    String?  // Made optional
+  action    String
+  resource  String
+  details   Json?
+  createdAt DateTime @default(now())
+  ipAddress String?
+  userAgent String?
+  user      User?    @relation(fields: [userId], references: [id]) // Made optional
 }
 
-// Subscription Management
 model Subscription {
-  id            String       @id @default(uuid())
-  organization  Organization @relation(fields: [orgId], references: [id])
-  orgId         String       @unique
-  plan          String
-  status        SubStatus    @default(ACTIVE)
-  startDate     DateTime     @default(now())
-  endDate       DateTime?
-  billingInfo   Json?
+  id           String       @id @default(uuid())
+  orgId        String       @unique
+  plan         String
+  status       SubStatus    @default(ACTIVE)
+  startDate    DateTime     @default(now())
+  endDate      DateTime?
+  billingInfo  Json?
+  organization Organization @relation(fields: [orgId], references: [id])
 }
 
-// Analytics Models
 model Dataset {
-  id            String       @id @default(uuid())
-  name          String
-  description   String?
-  createdAt     DateTime     @default(now())
-  updatedAt     DateTime     @updatedAt
-  organization  Organization @relation(fields: [orgId], references: [id])
-  orgId         String
-  dataSource    DataSource   @relation(fields: [dataSourceId], references: [id])
-  dataSourceId  String
-  schema        Json         // Column definitions and types
-  analyses      Analysis[]
-  data          Json[]       // Actual data rows
+  id           String       @id @default(uuid())
+  name         String
+  description  String?
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  orgId        String
+  dataSourceId String
+  schema       Json
+  data         Json[]
+  analyses     Analysis[]
+  dataSource   DataSource   @relation(fields: [dataSourceId], references: [id])
+  organization Organization @relation(fields: [orgId], references: [id])
 }
 
 model Analysis {
-  id            String       @id @default(uuid())
-  type          String      // AUTOMATED_EDA, FORECASTING, FULL_ANALYSIS
-  dataset       Dataset      @relation(fields: [datasetId], references: [id])
-  datasetId     String
-  parameters    Json?        // Analysis configuration
-  results       Json?        // Analysis results
-  status        String      // PENDING, RUNNING, COMPLETED, FAILED
-  createdAt     DateTime     @default(now())
-  updatedAt     DateTime     @updatedAt
-  error         String?      // Error message if failed
+  id         String   @id @default(uuid())
+  type       String
+  datasetId  String
+  parameters Json?
+  results    Json?
+  status     String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  error      String?
+  dataset    Dataset  @relation(fields: [datasetId], references: [id])
 }
 
 model IndustrySchema {
-  id            String       @id @default(uuid())
-  type          String      @unique // retail, wholesale, etc.
-  name          String
-  description   String?
-  schema        Json        // Field definitions and transformations
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
+  id          String   @id @default(uuid())
+  type        String   @unique
+  name        String
+  description String?
+  schema      Json
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model AnalyticsReport {
-  id            String       @id @default(uuid())
-  name          String
-  description   String?
-  organization  Organization @relation(fields: [orgId], references: [id])
-  orgId         String
-  type          String      // daily, weekly, monthly, custom
-  config        Json        // Report configuration
-  schedule      String?     // Cron expression for scheduled reports
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
-  lastRun       DateTime?
-  results       Json?       // Latest report results
+  id           String       @id @default(uuid())
+  name         String
+  description  String?
+  orgId        String
+  type         String
+  config       Json
+  schedule     String?
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  lastRun      DateTime?
+  results      Json?
+  organization Organization @relation(fields: [orgId], references: [id])
 }
 
 model AnalyticsSchedule {
-  id            String       @id @default(uuid())
-  organization  Organization @relation(fields: [orgId], references: [id])
-  orgId         String
-  frequency     String       // e.g., 'hourly', 'daily', 'custom'
-  interval      Int?         // Interval in minutes for custom schedules
-  createdAt     DateTime     @default(now())
-  updatedAt     DateTime     @updatedAt
+  id           String       @id @default(uuid())
+  orgId        String
+  frequency    String
+  interval     Int?
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  organization Organization @relation(fields: [orgId], references: [id])
 }
 
-// Payment Models
+model Payment {
+  id                 String          @id @default(cuid())
+  userId             String
+  amount             Decimal         @db.Decimal(10, 2)
+  currency           String          @default("KES")
+  provider           PaymentProvider
+  status             PaymentStatus   @default(PENDING)
+  checkoutRequestId  String?         @unique
+  merchantRequestId  String?
+  mpesaReceiptNumber String?
+  phoneNumber        String?
+  errorMessage       String?
+  retryCount         Int             @default(0)
+  metadata           Json?
+  createdAt          DateTime        @default(now())
+  updatedAt          DateTime        @updatedAt
+  orgId              String
+  callbacks          MpesaCallback[]
+  organization       Organization    @relation(fields: [orgId], references: [id])
+  user               User            @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([orgId])
+  @@index([status])
+}
+
+model MpesaCallback {
+  id                 String   @id @default(cuid())
+  checkoutRequestId  String
+  merchantRequestId  String
+  resultCode         String
+  resultDesc         String
+  amount             Decimal  @db.Decimal(10, 2)
+  mpesaReceiptNumber String?
+  phoneNumber        String
+  transactionDate    DateTime
+  metadata           Json?
+  createdAt          DateTime @default(now())
+  payment            Payment  @relation(fields: [checkoutRequestId], references: [checkoutRequestId])
+
+  @@index([checkoutRequestId])
+  @@index([transactionDate])
+}
+
+model PaymentReconciliation {
+  id                     String       @id @default(cuid())
+  date                   DateTime     @unique
+  totalTransactions      Int
+  successfulTransactions Int
+  failedTransactions     Int
+  totalAmount            Decimal      @db.Decimal(10, 2)
+  metadata               Json?
+  createdAt              DateTime     @default(now())
+  orgId                  String
+  organization           Organization @relation(fields: [orgId], references: [id])
+
+  @@index([date])
+  @@index([orgId])
+}
+
 enum PaymentStatus {
   PENDING
   COMPLETED
@@ -194,67 +243,6 @@ enum PaymentProvider {
   STRIPE
 }
 
-model Payment {
-  id                String         @id @default(cuid())
-  userId            String
-  user              User           @relation(fields: [userId], references: [id])
-  orgId             String
-  organization      Organization   @relation(fields: [orgId], references: [id])
-  amount            Decimal        @db.Decimal(10, 2)
-  currency          String         @default("KES")
-  provider          PaymentProvider
-  status            PaymentStatus  @default(PENDING)
-  checkoutRequestId String?        @unique // M-Pesa checkout request ID
-  merchantRequestId String?        // M-Pesa merchant request ID  
-  mpesaReceiptNumber String?       // M-Pesa transaction receipt
-  phoneNumber       String?        // Customer phone number
-  errorMessage      String?        // Error message if payment fails
-  retryCount        Int           @default(0)
-  metadata          Json?         // Additional payment metadata
-  createdAt         DateTime      @default(now())
-  updatedAt         DateTime      @updatedAt
-  callbacks         MpesaCallback[]
-
-  @@index([userId])
-  @@index([orgId])
-  @@index([status])
-}
-
-model MpesaCallback {
-  id                String    @id @default(cuid())
-  payment           Payment   @relation(fields: [checkoutRequestId], references: [checkoutRequestId])
-  checkoutRequestId String
-  merchantRequestId String
-  resultCode        String
-  resultDesc        String
-  amount            Decimal   @db.Decimal(10, 2)
-  mpesaReceiptNumber String?
-  phoneNumber       String
-  transactionDate   DateTime
-  metadata          Json?
-  createdAt         DateTime  @default(now())
-
-  @@index([checkoutRequestId])
-  @@index([transactionDate])
-}
-
-model PaymentReconciliation {
-  id                    String    @id @default(cuid())
-  date                  DateTime  @unique
-  totalTransactions     Int
-  successfulTransactions Int
-  failedTransactions    Int
-  totalAmount          Decimal   @db.Decimal(10, 2)
-  metadata             Json?
-  createdAt            DateTime  @default(now())
-  orgId                String    // Link to organization
-  organization         Organization @relation(fields: [orgId], references: [id])
-
-  @@index([date])
-  @@index([orgId])
-}
-
-// Enums
 enum UserRole {
   SUPER_ADMIN
   ADMIN
@@ -309,4 +297,3 @@ enum SubStatus {
   EXPIRED
   PAST_DUE
 }
-

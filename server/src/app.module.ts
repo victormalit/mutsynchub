@@ -1,6 +1,7 @@
-import { Module } from '@nestjs/common';
-import { APP_INTERCEPTOR } from '@nestjs/core';
+import { Module, OnModuleInit } from '@nestjs/common';
+import { APP_INTERCEPTOR, ModuleRef } from '@nestjs/core';
 import { ConfigModule } from '@nestjs/config';
+import { CommonModule } from './common/common.module';
 import { PrismaModule } from './infrastructure/persistence/prisma/prisma.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { UserModule } from './modules/user/user.module';
@@ -12,6 +13,9 @@ import { WebsocketModule } from './interfaces/websocket/websocket.module';
 import { ApiKeyModule } from './modules/api-key/api-key.module';
 import { AdminModule } from './modules/admin/admin.module';
 import { PaymentsModule } from './modules/payments/payments.module';
+import { AuditModule } from './audit/audit.module';
+import { AuditLoggerService } from './audit/audit-logger.service';
+import { PrismaService } from './infrastructure/persistence/prisma/prisma.service';
 
 @Module({
   imports: [
@@ -20,8 +24,10 @@ import { PaymentsModule } from './modules/payments/payments.module';
       isGlobal: true,
       cache: true,
     }),
-    // Database
+    // Common and Database
+    CommonModule,
     PrismaModule,
+    AuditModule,
     // Core modules
     AuthModule,
     UserModule,
@@ -43,4 +49,16 @@ import { PaymentsModule } from './modules/payments/payments.module';
   ],
   exports: [DataGateway],
 })
-export class AppModule {}
+export class AppModule implements OnModuleInit {
+  constructor(private moduleRef: ModuleRef) {}
+
+  async onModuleInit() {
+    const prismaService = this.moduleRef.get(PrismaService, { strict: false });
+    const auditLoggerService = this.moduleRef.get(AuditLoggerService, { strict: false });
+    if (prismaService && auditLoggerService) {
+      const { AuditPrismaMiddleware } = await import('./infrastructure/persistence/prisma/middleware/audit-prisma.middleware');
+      const auditMiddleware = new AuditPrismaMiddleware(auditLoggerService);
+      prismaService.setAuditPrismaMiddleware(auditMiddleware);
+    }
+  }
+}

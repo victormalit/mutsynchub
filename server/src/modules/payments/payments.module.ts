@@ -6,13 +6,16 @@ import { MpesaService } from './services/mpesa.service';
 import { PaymentSecurityService } from './services/payment-security.service';
 import { PaymentMonitoringService } from './services/payment-monitoring.service';
 import { PaymentMonitoringTasks } from './tasks/payment-monitoring.tasks';
-import { PrismaService } from '../../infrastructure/persistence/prisma/prisma.service';
 import mpesaConfig from './config/mpesa.config';
+import { CommonModule } from '../../common/common.module';
+import { AuditModule } from '../../audit/audit.module';
 
 @Module({
   imports: [
     ConfigModule.forFeature(mpesaConfig),
     ScheduleModule.forRoot(),
+    AuditModule,
+    CommonModule,
   ],
   controllers: [MpesaController],
   providers: [
@@ -20,7 +23,6 @@ import mpesaConfig from './config/mpesa.config';
     PaymentSecurityService,
     PaymentMonitoringService,
     PaymentMonitoringTasks,
-    PrismaService,
   ],
   exports: [MpesaService, PaymentSecurityService, PaymentMonitoringService],
 })

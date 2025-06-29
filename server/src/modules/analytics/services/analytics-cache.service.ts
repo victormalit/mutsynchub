@@ -1,17 +1,16 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { CACHE_MANAGER } from '@nestjs/cache-manager';
-import { Cache } from 'cache-manager';
-import { InjectRedis } from '@nestjs/redis';
 import Redis from 'ioredis';
 
 @Injectable()
 export class AnalyticsCacheService {
   private readonly logger = new Logger(AnalyticsCacheService.name);
   private readonly TTL = 24 * 60 * 60; // 24 hours in seconds
+  private readonly redis: Redis;
 
-  constructor(
-    @InjectRedis() private readonly redis: Redis,
-  ) {}
+  constructor() {
+    // You can configure the Redis connection string as needed
+    this.redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
+  }
 
   async cacheAnalysisResult(key: string, result: any): Promise<void> {
     try {
@@ -22,7 +21,7 @@ export class AnalyticsCacheService {
       );
       this.logger.debug(`Cached analysis result for key: ${key}`);
     } catch (error) {
-      this.logger.error(`Error caching analysis result: ${error.message}`);
+      this.logger.error(`Error caching analysis result: ${(error as any).message}`);
       throw error;
     }
   }
@@ -35,7 +34,7 @@ export class AnalyticsCacheService {
       }
       return null;
     } catch (error) {
-      this.logger.error(`Error retrieving cached analysis: ${error.message}`);
+      this.logger.error(`Error retrieving cached analysis: ${(error as any).message}`);
       return null;
     }
   }
@@ -45,7 +44,7 @@ export class AnalyticsCacheService {
       await this.redis.del(`analysis:${key}`);
       this.logger.debug(`Invalidated cache for key: ${key}`);
     } catch (error) {
-      this.logger.error(`Error invalidating cache: ${error.message}`);
+      this.logger.error(`Error invalidating cache: ${(error as any).message}`);
       throw error;
     }
   }

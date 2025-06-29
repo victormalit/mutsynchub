@@ -2,7 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { AnalysisRequestDto, AnalysisType } from '../interfaces/analysis-request.dto';
 import { DataCleaningService } from './data-cleaning.service';
 import { AnalyticsCacheService } from './analytics-cache.service';
-import { PrismaService } from '../../../infrastructure/prisma/prisma.service';
+import { PrismaService } from '../../../infrastructure/persistence/prisma/prisma.service';
 import { ConnectionStateService } from '../../../interfaces/websocket/connection-state.service';
 
 @Injectable()
@@ -33,8 +33,7 @@ export class AutomatedAnalysisService {
 
       // Fetch raw data
       const dataset = await this.prisma.dataset.findUnique({
-        where: { id: request.datasetId },
-        include: { data: true }
+        where: { id: request.datasetId }
       });
 
       if (!dataset) {
@@ -71,7 +70,7 @@ export class AutomatedAnalysisService {
 
       return analysisResult;
     } catch (error) {
-      this.logger.error(`Error running analysis: ${error.message}`);
+      this.logger.error(`Error running analysis: ${(error as any).message}`);
       throw error;
     }
   }

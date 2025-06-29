@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../../../infrastructure/persistence/prisma/prisma.service';
 import { ConfigService } from '@nestjs/config';
-import * as moment from 'moment';
+import moment from 'moment';
 
 @Injectable()
 export class PaymentMonitoringService {
@@ -88,6 +88,7 @@ export class PaymentMonitoringService {
           failedTransactions: summary.failedTransactions,
           totalAmount: summary.totalAmount,
           metadata: summary,
+          organization: null, /* TODO: provide organization value here, e.g. organizationId or object */
         },
       });
     } catch (error) {

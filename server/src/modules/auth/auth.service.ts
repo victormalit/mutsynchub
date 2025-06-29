@@ -1,8 +1,8 @@
-
 import { Injectable, UnauthorizedException, Logger, ForbiddenException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { UserService } from '../user/user.service';
+import { OrganizationService } from '../organization/organization.service';
 import * as argon2 from 'argon2';
 
 @Injectable()
@@ -18,6 +18,7 @@ export class AuthService {
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
+    private readonly organizationService: OrganizationService, // Inject OrganizationService
   ) {}
 
   async validateUser(email: string, password: string) {
@@ -69,13 +70,20 @@ export class AuthService {
   }
 
   async register(registerDto: any) {
-    // Hash password before creating user (argon2)
+    // 1. Create organization
+    const organization = await this.organizationService.create({
+      name: registerDto.organizationName,
+      subdomain: registerDto.subdomain,
+    });
+    // 2. Hash password before creating user (argon2)
     const hashedPassword = await argon2.hash(registerDto.password);
+    // 3. Create user with orgId
     const user = await this.userService.create({
       ...registerDto,
+      orgId: organization.id,
       password: hashedPassword,
     });
-    this.logger.log(`User registered: email=${user.email}, id=${user.id}`);
+    this.logger.log(`User registered: email=${user.email}, id=${user.id}, orgId=${organization.id}`);
     return this.login(user);
   }
 }

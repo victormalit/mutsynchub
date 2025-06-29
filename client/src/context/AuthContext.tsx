@@ -36,7 +36,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   useEffect(() => {
     // Try to load token from localStorage (or cookie, etc.)
-    const storedToken = localStorage.getItem('jwt_token');
+    const storedToken = localStorage.getItem('token'); // fix: use 'token' not 'jwt_token'
     if (storedToken) {
       setToken(storedToken);
       // Fetch user profile from backend

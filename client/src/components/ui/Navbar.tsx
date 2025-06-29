@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Sun, Moon, Menu, X, ChevronDown } from "lucide-react";
+import { Sun, Moon, Menu, X } from "lucide-react";
 import {
   NavigationMenu,
   NavigationMenuList,
@@ -30,6 +30,7 @@ import {
 import logo from "@/assets/images/mutsynchub-logo.png";
 import { cn } from "@/lib/utils";
 import SSOLogin from "@/components/ui/SSOLogin";
+import SolutionsSidebar from "@/components/ui/SolutionsSidebar";
 
 // Google "or" divider component
 const OrDivider = () => (
@@ -89,7 +90,16 @@ const Navbar: React.FC = () => {
 
   return (
     <header className="sticky top-0 z-50 w-full backdrop-blur-md bg-white/10 dark:bg-zinc-900/50 border-b border-white/10 dark:border-zinc-800 transition-all duration-300">
+      <SolutionsSidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
       <div className="w-full px-4 py-3 flex justify-between">
+        {/* Sidebar menu icon */}
+        <button
+          className="mr-2 flex items-center justify-center h-10 w-10 rounded-lg bg-white/80 hover:bg-blue-100 border border-blue-200 shadow-md md:mr-4"
+          onClick={() => setSidebarOpen(true)}
+          aria-label="Open sidebar"
+        >
+          <Menu className="h-6 w-6 text-black" />
+        </button>
         {/* Logo & Brand */}
         <Link to="/" className="flex items-center space-x-2">
           <img src={logo} alt="MutSyncHub Logo" className="h-8 w-8" />
@@ -133,61 +143,12 @@ const Navbar: React.FC = () => {
 
           {/* Auth buttons (desktop) */}
           <div className="hidden md:flex items-center gap-2">
-            {/* Login Dialog */}
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button variant="outline">Login</Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Login</DialogTitle>
-                  <DialogDescription>Enter your credentials to sign in.</DialogDescription>
-                </DialogHeader>
-                <form className="space-y-4 mt-4">
-                  <div>
-                    <Label htmlFor="email">Email</Label>
-                    <Input type="email" id="email" placeholder="you@example.com" />
-                  </div>
-                  <div>
-                    <Label htmlFor="password">Password</Label>
-                    <Input type="password" id="password" placeholder="••••••••" />
-                  </div>
-                  <Button type="submit" className="w-full">Login</Button>
-                </form>
-                <OrDivider />
-                <SSOLogin />
-              </DialogContent>
-            </Dialog>
-
-            {/* Signup Dialog */}
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button>Sign Up</Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Create Account</DialogTitle>
-                  <DialogDescription>Fill in your details to get started.</DialogDescription>
-                </DialogHeader>
-                <form className="space-y-4 mt-4">
-                  <div>
-                    <Label htmlFor="name">Full Name</Label>
-                    <Input type="text" id="name" placeholder="John Doe" />
-                  </div>
-                  <div>
-                    <Label htmlFor="email">Email</Label>
-                    <Input type="email" id="email" placeholder="you@example.com" />
-                  </div>
-                  <div>
-                    <Label htmlFor="password">Password</Label>
-                    <Input type="password" id="password" placeholder="••••••••" />
-                  </div>
-                  <Button type="submit" className="w-full">Sign Up</Button>
-                </form>
-                <OrDivider />
-                <SSOLogin />
-              </DialogContent>
-            </Dialog>
+            <Link to="/login">
+              <Button variant="outline">Login</Button>
+            </Link>
+            <Link to="/signup">
+              <Button>Sign Up</Button>
+            </Link>
           </div>
 
           {/* Mobile menu */}
@@ -219,60 +180,14 @@ const Navbar: React.FC = () => {
                   ))}
                 </nav>
                 <div className="p-4 border-t">
-                  <Dialog>
-                    <DialogTrigger asChild>
-                      <Button variant="outline" className="w-full mb-2">
-                        Login
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent>
-                      <DialogHeader>
-                        <DialogTitle>Login</DialogTitle>
-                        <DialogDescription>Enter your credentials to sign in.</DialogDescription>
-                      </DialogHeader>
-                      <form className="space-y-4 mt-4">
-                        <div>
-                          <Label htmlFor="email">Email</Label>
-                          <Input type="email" id="email" placeholder="you@example.com" />
-                        </div>
-                        <div>
-                          <Label htmlFor="password">Password</Label>
-                          <Input type="password" id="password" placeholder="••••••••" />
-                        </div>
-                        <Button type="submit" className="w-full">Login</Button>
-                      </form>
-                      <OrDivider />
-                      <SSOLogin />
-                    </DialogContent>
-                  </Dialog>
-                  <Dialog>
-                    <DialogTrigger asChild>
-                      <Button className="w-full">Sign Up</Button>
-                    </DialogTrigger>
-                    <DialogContent>
-                      <DialogHeader>
-                        <DialogTitle>Create Account</DialogTitle>
-                        <DialogDescription>Fill in your details to get started.</DialogDescription>
-                      </DialogHeader>
-                      <form className="space-y-4 mt-4">
-                        <div>
-                          <Label htmlFor="name">Full Name</Label>
-                          <Input type="text" id="name" placeholder="John Doe" />
-                        </div>
-                        <div>
-                          <Label htmlFor="email">Email</Label>
-                          <Input type="email" id="email" placeholder="you@example.com" />
-                        </div>
-                        <div>
-                          <Label htmlFor="password">Password</Label>
-                          <Input type="password" id="password" placeholder="••••••••" />
-                        </div>
-                        <Button type="submit" className="w-full">Sign Up</Button>
-                      </form>
-                      <OrDivider />
-                      <SSOLogin />
-                    </DialogContent>
-                  </Dialog>
+                  <Link to="/login">
+                    <Button variant="outline" className="w-full mb-2">
+                      Login
+                    </Button>
+                  </Link>
+                  <Link to="/signup">
+                    <Button className="w-full">Sign Up</Button>
+                  </Link>
                 </div>
               </DrawerContent>
             </Drawer>

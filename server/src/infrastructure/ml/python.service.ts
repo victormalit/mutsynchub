@@ -16,7 +16,7 @@ export class PythonService {
     try {
       await fs.mkdir(this.scriptsPath, { recursive: true });
     } catch (error) {
-      this.logger.error(`Error creating scripts directory: ${error.message}`);
+      this.logger.error(`Error creating scripts directory: ${(error as any).message}`);
     }
   }
 
@@ -51,12 +51,12 @@ export class PythonService {
           try {
             resolve(JSON.parse(result));
           } catch (e) {
-            reject(new Error(`Failed to parse Prophet output: ${e.message}`));
+            reject(new Error(`Failed to parse Prophet output: ${(e as any).message}`));
           }
         });
       });
     } catch (error) {
-      this.logger.error(`Error running Prophet forecast: ${error.message}`);
+      this.logger.error(`Error running Prophet forecast: ${(error as any).message}`);
       throw error;
     }
   }
@@ -180,12 +180,12 @@ if __name__ == '__main__':
           try {
             resolve(JSON.parse(result));
           } catch (e) {
-            reject(new Error(`Failed to parse EDA output: ${e.message}`));
+            reject(new Error(`Failed to parse EDA output: ${(e as any).message}`));
           }
         });
       });
     } catch (error) {
-      this.logger.error(`Error running automated EDA: ${error.message}`);
+      this.logger.error(`Error running automated EDA: ${(error as any).message}`);
       throw error;
     }
   }

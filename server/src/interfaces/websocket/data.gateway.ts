@@ -50,7 +50,7 @@ export class DataGateway implements OnGatewayConnection, OnGatewayDisconnect {
       // Audit log
       this.logger.log(`WebSocket connection accepted: client=${client.id}`);
     } catch (error) {
-      this.logger.error(`Error handling connection: ${error.message}`, error.stack);
+      this.logger.error(`Error handling connection: ${(error as any).message}`, (error as any).stack);
       client.disconnect();
     }
   }
@@ -60,7 +60,7 @@ export class DataGateway implements OnGatewayConnection, OnGatewayDisconnect {
       this.logger.debug(`Client disconnected: ${client.id}`);
       this.connectionState.deregisterClient(client.id);
     } catch (error) {
-      this.logger.error(`Error handling disconnection: ${error.message}`, error.stack);
+      this.logger.error(`Error handling disconnection: ${(error as any).message}`, (error as any).stack);
     }
   }
 
@@ -85,8 +85,8 @@ export class DataGateway implements OnGatewayConnection, OnGatewayDisconnect {
       this.logger.log(`Client ${client.id} joined org ${orgId}`);
       return { success: true, message: 'Joined organization successfully' };
     } catch (error) {
-      this.logger.error(`Error joining org: ${error.message}`, error.stack);
-      throw new WsException(error.message);
+      this.logger.error(`Error joining org: ${(error as any).message}`, (error as any).stack);
+      throw new WsException((error as any).message);
     }
   }
 
@@ -103,8 +103,8 @@ export class DataGateway implements OnGatewayConnection, OnGatewayDisconnect {
       this.logger.log(`Client ${client.id} left org ${orgId}`);
       return { success: true, message: 'Left organization successfully' };
     } catch (error) {
-      this.logger.error(`Error leaving org: ${error.message}`, error.stack);
-      throw new WsException(error.message);
+      this.logger.error(`Error leaving org: ${(error as any).message}`, (error as any).stack);
+      throw new WsException((error as any).message);
     }
   }
 
@@ -125,8 +125,8 @@ export class DataGateway implements OnGatewayConnection, OnGatewayDisconnect {
       this.logger.log(`Client ${client.id} subscribed to stream ${streamId}`);
       return { success: true, message: 'Subscribed to stream successfully' };
     } catch (error) {
-      this.logger.error(`Error subscribing to stream: ${error.message}`, error.stack);
-      throw new WsException(error.message);
+      this.logger.error(`Error subscribing to stream: ${(error as any).message}`, (error as any).stack);
+      throw new WsException((error as any).message);
     }
   }
 
@@ -143,8 +143,8 @@ export class DataGateway implements OnGatewayConnection, OnGatewayDisconnect {
       this.logger.log(`Client ${client.id} unsubscribed from stream ${streamId}`);
       return { success: true, message: 'Unsubscribed from stream successfully' };
     } catch (error) {
-      this.logger.error(`Error unsubscribing from stream: ${error.message}`, error.stack);
-      throw new WsException(error.message);
+      this.logger.error(`Error unsubscribing from stream: ${(error as any).message}`, (error as any).stack);
+      throw new WsException((error as any).message);
     }
   }
 
@@ -161,8 +161,8 @@ export class DataGateway implements OnGatewayConnection, OnGatewayDisconnect {
       this.server.to(`org:${orgId}`).emit(event, payload);
       this.logger.debug(`Broadcast to org ${orgId}: ${event}`);
     } catch (error) {
-      this.logger.error(`Error broadcasting to org: ${error.message}`, error.stack);
-      throw new WsException(error.message);
+      this.logger.error(`Error broadcasting to org: ${(error as any).message}`, (error as any).stack);
+      throw new WsException((error as any).message);
     }
   }
 
@@ -179,8 +179,8 @@ export class DataGateway implements OnGatewayConnection, OnGatewayDisconnect {
       this.server.to(`stream:${streamId}`).emit('streamUpdate', payload);
       this.logger.debug(`Broadcast to stream ${streamId}`);
     } catch (error) {
-      this.logger.error(`Error broadcasting to stream: ${error.message}`, error.stack);
-      throw new WsException(error.message);
+      this.logger.error(`Error broadcasting to stream: ${(error as any).message}`, (error as any).stack);
+      throw new WsException((error as any).message);
     }
   }
 }

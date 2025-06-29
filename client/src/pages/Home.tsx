@@ -1,5 +1,8 @@
 // src/routes/Home.tsx
 
+import React, { useState } from 'react';
+import { FaBars } from 'react-icons/fa';
+
 import SolutionsSidebar from "../components/ui/SolutionsSidebar";
 import HeroSection from "../components/home/HeroSection";
 import AboutSection from "../components/home/AboutSection";
@@ -7,12 +10,14 @@ import ProblemSolutionSection from "../components/home/ProblemSolutionSection";
 import FeaturesSection from "../components/home/FeaturesSection";
 import { FAQSection } from "../components/home/faq";
 import { CTASection } from "../components/home/cta";
-
-import React, { useState } from 'react';
-import { FaBars } from 'react-icons/fa';
+import { useAuth } from '../hooks/useAuth';
+import GlobalLoginReminder from '../components/ui/GlobalLoginReminder';
 
 export default function Home() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [showReminder, setShowReminder] = useState(true);
+  const { user } = useAuth();
+
   return (
     <div className="flex min-h-screen bg-gray-50">
       {/* Sidebar trigger icon */}
@@ -33,6 +38,9 @@ export default function Home() {
         <FAQSection/>
         <CTASection/>
       </main>
+      {showReminder && !user && (
+        <GlobalLoginReminder onClose={() => setShowReminder(false)} />
+      )}
     </div>
   );
 }

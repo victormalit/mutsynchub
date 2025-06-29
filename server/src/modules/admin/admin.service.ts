@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../infrastructure/persistence/prisma/prisma.service';
-import { UserRole } from '@prisma/client';
-import { AuditLoggerService } from '../../common/services/audit-logger.service';
+import { UserRole, Prisma, OrgStatus } from '@prisma/client';
+import { AuditLoggerService } from '../../audit/audit-logger.service';
 
 @Injectable()
 export class AdminService {
@@ -44,9 +44,11 @@ export class AdminService {
   async setOrganizationStatus(orgId: string, status: string, context?: { adminId?: string; ipAddress?: string; userAgent?: string }) {
     const org = await this.prisma.organization.findUnique({ where: { id: orgId } });
     if (!org) throw new NotFoundException('Organization not found');
+    // Ensure status is a valid OrgStatus enum value
+    const validStatus = (status as OrgStatus);
     const updated = await this.prisma.organization.update({
       where: { id: orgId },
-      data: { status },
+      data: { status: { set: validStatus } },
     });
     // Audit log org status change
     await this.auditLogger.log({
