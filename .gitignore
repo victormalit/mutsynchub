@@ -5,3 +5,5 @@ node_modules
 !*.env.example
 # Ignore secrets
 secrets.*
+server/.env
+server/.env
